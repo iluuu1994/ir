@@ -26,13 +26,13 @@ ifeq (x86_64, $(TARGET))
   DASM_FLAGS = -D X64=1
 endif
 ifeq (x86, $(TARGET))
-  CC= gcc -m32
-  CFLAGS += -DIR_TARGET_X86
+  CFLAGS += -m32 -DIR_TARGET_X86
   DASM_ARCH  = x86
   DASM_FLAGS =
 endif
 ifeq (aarch64, $(TARGET))
-  CC= aarch64-linux-gnu-gcc --sysroot=$(HOME)/php/ARM64
+  # FIXME: This overwrites clang from CI
+  #CC = aarch64-linux-gnu-gcc --sysroot=$(HOME)/php/ARM64
   CFLAGS += -DIR_TARGET_AARCH64
   DASM_ARCH  = aarch64
   DASM_FLAGS =
@@ -92,7 +92,7 @@ $(SRC_DIR)/ir_load.c: $(SRC_DIR)/ir.g
 $(BUILD_DIR)/ir_fold_hash.h: $(BUILD_DIR)/gen_ir_fold_hash $(SRC_DIR)/ir_fold.h $(SRC_DIR)/ir.h
 	$(BUILD_DIR)/gen_ir_fold_hash < $(SRC_DIR)/ir_fold.h > $(BUILD_DIR)/ir_fold_hash.h
 $(BUILD_DIR)/gen_ir_fold_hash: $(SRC_DIR)/gen_ir_fold_hash.c $(SRC_DIR)/ir_strtab.c
-	$(BUILD_CC) $(CFLAGS) $(LDFALGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFALGS) -o $@ $^
 
 $(BUILD_DIR)/minilua: $(SRC_DIR)/dynasm/minilua.c
 	$(BUILD_CC) $(SRC_DIR)/dynasm/minilua.c -lm -o $@
@@ -107,6 +107,9 @@ test: $(BUILD_DIR)/ir
 	$(BUILD_DIR)/ir $(SRC_DIR)/test.ir --dot $(BUILD_DIR)/ir.dot
 	dot -Tpdf $(BUILD_DIR)/ir.dot -o $(BUILD_DIR)/ir.pdf
 	BUILD_DIR=$(BUILD_DIR) SRC_DIR=$(SRC_DIR) $(PHP) $(SRC_DIR)/ir-test.php
+
+test-ci: $(BUILD_DIR)/ir
+	BUILD_DIR=$(BUILD_DIR) SRC_DIR=$(SRC_DIR) $(PHP) $(SRC_DIR)/ir-test.php --show-diff
 
 clean:
 	rm -rf $(BUILD_DIR)/ir $(BUILD_DIR)/ir_test $(BUILD_DIR)/*.o \
