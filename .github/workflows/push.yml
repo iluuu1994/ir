@@ -25,9 +25,9 @@ jobs:
             libcapstone4 \
             make
       - name: make
-        run: make TARGET=x86_64 all
+        run: make TARGET=x86_64 CFLAGS="-fsanitize=address,undefined" all
       - name: test
-        run: make CXX=g++-12 TARGET=x86_64 test-ci
+        run: make CXX=g++-12 TARGET=x86_64 CFLAGS="-fsanitize=address,undefined" test-ci
   Linux_i386:
     name: 'Linux i386'
     runs-on: ubuntu-22.04
@@ -56,9 +56,9 @@ jobs:
           cd ..
           rm -rf capstone-4.0.2 capstone.tar.gz
       - name: make
-        run: make TARGET=x86 all
+        run: make TARGET=x86 CFLAGS="-fsanitize=address,undefined" all
       - name: test
-        run: make CXX=g++-12 TARGET=x86 test-ci
+        run: make CXX=g++-12 TARGET=x86 CFLAGS="-fsanitize=address,undefined" test-ci
   Linux_aarch64:
     name: 'Linux aarch64'
     runs-on: ubuntu-20.04
@@ -82,7 +82,7 @@ jobs:
           run: |
             make CC=gcc TARGET=aarch64 all
             # FIXME: For some reason some of the object files are rebuilt
-            make CC=gcc CXX=g++-12 TARGET=aarch64 test-ci
+            make CC=gcc CXX=g++-12 TARGET=aarch64 CFLAGS="-fsanitize=address,undefined" test-ci
 
   Windows:
     strategy:

@@ -193,6 +193,8 @@ namespace ir {
 			out_buf << std::ifstream(out_file).rdbuf();
 			std::string out = trim(out_buf.str());
 			out.erase(std::remove(out.begin(), out.end(), '\r'), out.end());
+			// Treat $printf and $_IO_printf as aliases
+			out = std::regex_replace(out, std::regex("(\\$_IO_printf)"), "$printf");
 
 			if (ret_code || out.compare(expect)) {
 				std::ofstream exp_os(exp_file);
