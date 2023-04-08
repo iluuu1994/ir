@@ -41,7 +41,7 @@ test:
 	movl %r10d, 0x18(%rsp)
 	movl 0x48(%rsp), %r10d
 	movl %r10d, 0x20(%rsp)
-	movabsq $_IO_printf, %rax
+	movabsq $printf, %rax
 	callq *%rax
 	addq $0x28, %rsp
 	retq
